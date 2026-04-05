@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Context Ops
+
+A web application that converts the real context of a person or small business into actionable development decisions. It helps capture information about their environment, detect problems/opportunities, prioritize them, convert them into a backlog, and generate technical specifications ready for execution.
+
+## Stack
+
+- **Frontend**: Next.js 14 (App Router) + TypeScript
+- **UI**: Tailwind CSS + custom shadcn-style components
+- **Backend**: Next.js API Route Handlers
+- **Database**: PostgreSQL with Prisma 7
+- **Auth**: NextAuth.js (credentials provider)
+- **Validation**: Zod + React Hook Form
+- **AI Layer**: Mocked spec generator (ready for OpenAI swap)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+
+- PostgreSQL running at `localhost:5432`
+
+### Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env` file:
+   ```env
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/contextops"
+   NEXTAUTH_SECRET="your-secret-here"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
+
+3. Push the database schema:
+   ```bash
+   npx prisma db push
+   ```
+
+4. Seed the database:
+   ```bash
+   npx prisma db seed
+   ```
+
+5. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) and log in with:
+- **Email**: `ops@contextops.dev`
+- **Password**: `contextops2024`
+
+## Features
+
+- **Contexts**: Capture comprehensive information about a person or business environment
+- **Evidences**: Attach links, notes, observations, findings, and ideas to contexts
+- **Opportunities**: Identify and score opportunities using a configurable priority formula
+- **Backlog**: Convert opportunities into development tasks with effort sizing and status tracking
+- **MVP Specs**: Auto-generate technical specification documents from opportunities
+- **Settings**: Configure scoring weights for the priority formula
+
+## Priority Scoring Formula
+
+```
+Score = (Impact × w₁) + (Urgency × w₂) + (Confidence × w₃) + (Pain × w₄) − (Effort × w₅)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Default weights: Impact 0.35, Urgency 0.20, Confidence 0.15, Pain 0.20, Effort 0.10
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `src/` for the full application structure:
+- `app/` — Next.js App Router pages and API routes
+- `components/` — UI and feature components
+- `lib/` — Database client, auth config, validations, AI layer, utilities
+- `types/` — Shared TypeScript types
+- `prisma/` — Schema and seed data

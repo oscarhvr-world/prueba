@@ -1,13 +1,137 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  contexts  Context[]
+  settings  Settings?
+}
+
+model Settings {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impactWeight     Float    @default(0.35)
+  urgencyWeight    Float    @default(0.20)
+  confidenceWeight Float    @default(0.15)
+  painWeight       Float    @default(0.20)
+  effortWeight     Float    @default(0.10)
+  updatedAt        DateTime @updatedAt
+}
+
+model Context {
+  id                    String        @id @default(cuid())
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                  String
+  userType              String?
+  city                  String?
+  mainActivity          String?
+  sector                String?
+  previousExperience    String?
+  currentAssets         String?
+  mainPains             String?
+  repetitiveTasks       String?
+  detectedOpportunities String?
+  approxBudget          String?
+  urgency               String?       @default("medium")
+  digitalChannels       String[]      @default([])
+  tools                 String[]      @default([])
+  technicalLevel        String?       @default("intermediate")
+  availableTime         String?
+  objectives            String?
+  restrictions          String?
+  notes                 String?
+  status                String        @default("active")
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  evidences             Evidence[]
+  opportunities         Opportunity[]
+}
+
+model Evidence {
+  id        String   @id @default(cuid())
+  contextId String
+  context   Context  @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  content   String
+  url       String?
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Opportunity {
+  id               String       @id @default(cuid())
+  contextId        String
+  context          Context      @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  category         String
+  impact           Int          @default(5)
+  effort           Int          @default(5)
+  urgency          Int          @default(5)
+  confidence       Int          @default(5)
+  pain             Int          @default(5)
+  priorityScore    Float        @default(0)
+  painResolved     String?
+  valueType        String?
+  affectedChannel  String?
+  solutionProposal String?
+  status           String       @default("identified")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  backlogItems     BacklogItem[]
+  mvpSpec          MvpSpec?
+}
+
+model BacklogItem {
+  id                 String       @id @default(cuid())
+  opportunityId      String?
+  opportunity        Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  title              String
+  description        String
+  type               String
+  priority           String       @default("medium")
+  status             String       @default("draft")
+  acceptanceCriteria String?
+  dependencies       String?
+  effort             String?
+  technicalNotes     String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+model MvpSpec {
+  id              String      @id @default(cuid())
+  opportunityId   String      @unique
+  opportunity     Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  problem         String
+  targetUser      String
+  mvpObjective    String
+  scope           String
+  outOfScope      String?
+  features        String
+  mainFlow        String
+  requiredData    String?
+  metrics         String?
+  risks           String?
+  assumptions     String?
+  suggestedStack  String?
+  nextIteration   String?
+  markdownContent String
+  generatedBy     String      @default("mock")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
